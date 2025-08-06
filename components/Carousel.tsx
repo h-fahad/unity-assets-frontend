@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { assetService, type Asset } from "@/services/assetService";
 import { getImageUrl } from "@/lib/utils";
 
@@ -65,9 +66,11 @@ export default function Carousel() {
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-8">
       <div className="overflow-hidden rounded-xl border bg-white shadow">
-        <img
+        <Image
           src={getImageUrl(assets[current].thumbnail)}
           alt={assets[current].name}
+          width={800}
+          height={256}
           className="w-full h-64 object-cover object-center"
         />
         <div className="absolute bottom-4 left-0 right-0 flex justify-center">

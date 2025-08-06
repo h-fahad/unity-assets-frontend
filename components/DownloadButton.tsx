@@ -34,8 +34,8 @@ export default function DownloadButton({ assetId }: DownloadButtonProps) {
       document.body.removeChild(link);
       
       toast.success(`Download started for ${result.asset.name}`);
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || 'Unknown error';
+    } catch (error: unknown) {
+      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
       toast.error(`Download failed: ${errorMsg}`);
     } finally {
       setDownloading(false);

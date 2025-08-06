@@ -5,8 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Mail, ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
-import { authService } from '@/lib/auth';
+import { ArrowLeft, CheckCircle, AlertCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function ResetPasswordPage() {
@@ -52,7 +51,7 @@ export default function ResetPasswordPage() {
         setError(errorMsg);
         toast.error(errorMsg);
       }
-    } catch (err) {
+    } catch {
       const errorMsg = 'Network error. Please try again.';
       setError(errorMsg);
       toast.error(errorMsg);
@@ -105,7 +104,7 @@ export default function ResetPasswordPage() {
         setError(errorMsg);
         toast.error(errorMsg);
       }
-    } catch (err) {
+    } catch {
       const errorMsg = 'Network error. Please try again.';
       setError(errorMsg);
       toast.error(errorMsg);

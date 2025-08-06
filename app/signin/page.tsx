@@ -25,8 +25,9 @@ export default function SignInPage() {
     
     try {
       await login(email, password);
-    } catch (error: any) {
-      setError(error.response?.data?.message || "Invalid credentials");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Invalid credentials";
+      setError(errorMessage);
     }
   }
 
