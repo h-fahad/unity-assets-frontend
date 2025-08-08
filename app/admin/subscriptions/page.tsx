@@ -7,12 +7,12 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { subscriptionService, type SubscriptionPlan, type AssignSubscriptionData } from "@/services/subscriptionService";
-import { userService, type User } from "@/services/userService";
+import { userService, type UserWithStats } from "@/services/userService";
 
 export default function AdminSubscriptions() {
   const { user } = useUserStore();
   const router = useRouter();
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserWithStats[]>([]);
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<AssignSubscriptionData>({
@@ -38,7 +38,7 @@ export default function AdminSubscriptions() {
         userService.getAllUsers(),
         subscriptionService.getPlans(),
       ]);
-      setUsers(usersData);
+      setUsers(usersData.users);
       setPlans(plansData);
     } catch (error) {
       console.error("Failed to load data:", error);

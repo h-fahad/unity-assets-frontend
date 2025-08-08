@@ -7,7 +7,7 @@ export interface User {
   role: 'USER' | 'ADMIN';
   createdAt: string;
   updatedAt: string;
-  subscription?: UserSubscription;
+  subscription?: UserSubscription | null;
   downloadCount?: number;
 }
 
