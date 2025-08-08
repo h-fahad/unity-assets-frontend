@@ -6,12 +6,13 @@ import { notFound } from 'next/navigation';
 import { getImageUrl } from '@/lib/utils';
 
 interface AssetDetailPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default async function AssetDetailPage({ params }: AssetDetailPageProps) {
+  const { id } = await params;
   const assets = await getAssets();
-  const asset = assets.find(a => a.id === parseInt(params.id));
+  const asset = assets.find(a => a.id === parseInt(id));
 
   if (!asset) return notFound();
 
