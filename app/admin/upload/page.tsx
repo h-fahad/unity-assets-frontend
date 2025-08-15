@@ -217,7 +217,6 @@ export default function AdminUploadPage() {
                 accept="image/*,video/*"
                 onChange={(e) => setCover(e.target.files?.[0] || null)}
                 required
-                key={cover ? "cover-selected" : "cover-empty"}
               />
               <p className="text-xs text-gray-500 mt-1">Supports images and videos</p>
             </div>
@@ -231,7 +230,6 @@ export default function AdminUploadPage() {
                 accept=".unitypackage"
                 onChange={(e) => setAssetFile(e.target.files?.[0] || null)}
                 required
-                key={assetFile ? "asset-selected" : "asset-empty"}
               />
             </div>
             

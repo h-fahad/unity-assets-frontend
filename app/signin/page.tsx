@@ -22,7 +22,7 @@ export default function SignInPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    
+    console.log(email, password);
     try {
       await login(email, password);
     } catch (error: unknown) {
@@ -56,7 +56,7 @@ export default function SignInPage() {
           />
         </label>
         {error && <div className="text-red-600 text-sm whitespace-pre-line">{error}</div>}
-        <Button type="submit" className="mt-2" disabled={isLoading}>
+        <Button className="mt-2" disabled={isLoading}>
           {isLoading ? "Signing In..." : "Sign In"}
         </Button>
         <div className="text-sm text-center mt-2">
