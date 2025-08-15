@@ -4,7 +4,6 @@ export interface Asset {
   id: number;
   name: string;
   description: string;
-  price: number;
   fileUrl: string;
   thumbnail: string;
   tags: string[];
@@ -33,7 +32,6 @@ export interface CreateAssetData {
   name: string;
   description: string;
   category: string;
-  price: number;
   fileUrl: string;
   thumbnail: string;
 }

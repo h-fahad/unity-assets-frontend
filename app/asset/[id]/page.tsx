@@ -30,7 +30,6 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
             <Badge variant="secondary">{asset.category.name}</Badge>
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-600">
-            <span>Price: ${asset.price}</span>
             <span>Downloads: {asset.downloadCount}</span>
           </div>
           {asset.tags && asset.tags.length > 0 && (

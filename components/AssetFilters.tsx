@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { categoryService } from '@/services/categoryService';
 import { Category } from '@/types/category';
 
-const SORT_OPTIONS = ['Most Downloaded', 'Latest', 'Price Low to High', 'Price High to Low'];
+const SORT_OPTIONS = ['Most Downloaded', 'Latest'];
 
 interface AssetFiltersProps {
   category: string;

@@ -18,7 +18,6 @@ export default function AdminUploadPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [price, setPrice] = useState(0);
   const [tags, setTags] = useState("");
   const [isPremium, setIsPremium] = useState(false);
   const [cover, setCover] = useState<File | null>(null);
@@ -71,7 +70,6 @@ export default function AdminUploadPage() {
     formData.append("name", title);
     formData.append("description", description);
     formData.append("categoryId", categoryId.toString());
-    formData.append("price", price.toString());
     formData.append("thumbnail", cover);
     formData.append("assetFile", assetFile);
 
@@ -91,7 +89,6 @@ export default function AdminUploadPage() {
         setTitle("");
         setDescription("");
         setCategoryId(categories.length > 0 ? categories[0].id : null);
-        setPrice(0);
         setTags("");
         setIsPremium(false);
         setCover(null);
@@ -191,18 +188,6 @@ export default function AdminUploadPage() {
               </p>
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium">Price ($)</label>
-              <Input
-                type="number"
-                value={price}
-                onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-                step="0.01"
-                min="0"
-              />
-              <p className="text-xs text-gray-500 mt-1">Set to 0 for free assets</p>
-            </div>
             
             <div>
               <label className="block mb-1 font-medium">

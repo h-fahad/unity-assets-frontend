@@ -3,8 +3,13 @@ import api from '../lib/axios';
 export interface SubscriptionPlan {
   id: number;
   name: string;
-  price: number;
-  durationInDays: number;
+  description?: string;
+  basePrice: number;
+  billingCycle: 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+  yearlyDiscount: number;
+  dailyDownloadLimit: number;
+  features: string[];
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,8 +26,12 @@ export interface UserSubscription {
 
 export interface CreatePlanData {
   name: string;
-  price: number;
-  durationInDays: number;
+  description?: string;
+  basePrice: number;
+  billingCycle: 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+  yearlyDiscount?: number;
+  dailyDownloadLimit: number;
+  features?: string[];
 }
 
 export interface UpdatePlanData extends Partial<CreatePlanData> {}
@@ -30,14 +39,12 @@ export interface UpdatePlanData extends Partial<CreatePlanData> {}
 export interface AssignSubscriptionData {
   userId: number;
   planId: number;
-  startDate: string;
-  endDate: string;
-  downloadLimit?: number;
+  startDate?: string;
 }
 
 export const subscriptionService = {
   async getPlans(): Promise<SubscriptionPlan[]> {
-    const response = await api.get('/subscriptions');
+    const response = await api.get('/subscriptions/plans');
     return response.data;
   },
 
@@ -87,12 +94,13 @@ export async function getSubscriptionPlans() {
   return plans.map(plan => ({
     id: plan.id.toString(),
     name: plan.name,
-    price: plan.price,
-    dailyDownloadLimit: plan.durationInDays, // This is a mapping - adjust as needed
-    features: [
+    price: plan.basePrice,
+    dailyDownloadLimit: plan.dailyDownloadLimit,
+    features: plan.features.length > 0 ? plan.features : [
       `${plan.name} plan features`,
-      `${plan.durationInDays} days duration`,
-      `$${plan.price} price`,
+      `${plan.billingCycle} billing`,
+      `$${plan.basePrice} price`,
+      `${plan.dailyDownloadLimit} downloads per day`,
     ],
   }));
 } 

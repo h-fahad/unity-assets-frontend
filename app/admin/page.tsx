@@ -55,7 +55,7 @@ export default function AdminDashboard() {
         getAssets(),
         subscriptionService.getAdminStats().catch(() => ({ 
           totalDownloads: 0, 
-          activeSubscriptions: 0,
+          active: 0,
           recentActivity: [] 
         })),
         userService.getAllUsers().catch(() => ({ users: [] }))
@@ -63,9 +63,9 @@ export default function AdminDashboard() {
 
       setStats({
         totalAssets: assets.length,
-        totalDownloads: adminStats.totalDownloads || assets.reduce((sum, a) => sum + (a.downloadCount || 0), 0),
+        totalDownloads: adminStats.totalDownloads || 0,
         totalUsers: usersResponse.users ? usersResponse.users.length : 0,
-        activeSubscriptions: adminStats.activeSubscriptions || 0,
+        activeSubscriptions: adminStats.active || 0,
         recentActivity: adminStats.recentActivity || []
       });
     } catch (error) {
@@ -228,46 +228,6 @@ export default function AdminDashboard() {
           </Card>
         </div>
       </div>
-
-      {/* Main Actions Card */}
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-center">Admin Actions</CardTitle>
-        </CardHeader>
-        <CardFooter className="flex flex-col sm:flex-row gap-4 justify-center items-center py-6">
-          <Button size="lg" onClick={() => router.push("/admin/upload")}>
-            Upload New Asset
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            onClick={() => router.push("/admin/subscriptions")}
-          >
-            Create Subscription
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            onClick={() => router.push("/admin/users")}
-          >
-            Manage Users
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            onClick={() => router.push("/admin/packages")}
-          >
-            Manage Packages
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            onClick={() => router.push("/admin/categories")}
-          >
-            Manage Categories
-          </Button>
-        </CardFooter>
-      </Card>
     </main>
   );
 } 

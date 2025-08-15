@@ -75,18 +75,12 @@ export default function AccountPage() {
         email: profileData.email
       });
       
-      // Try to get additional user stats
-      try {
-        const userData = await userService.getUser(user!.id);
-        console.log('User data with stats:', userData);
-        if (userData && '_count' in userData) {
-          setStats((userData as { _count: UserStats })._count);
-        } else {
-          setStats({ downloads: 0, assets: 0 });
-        }
-      } catch (statsError) {
-        console.warn('Could not load user stats:', statsError);
-        // Set default stats if we can't load them
+      // Extract stats from profile data
+      if (profileData && '_count' in profileData) {
+        console.log('Profile _count data:', profileData._count);
+        setStats((profileData as { _count: UserStats })._count);
+      } else {
+        console.log('No _count data in profile, setting default stats');
         setStats({ downloads: 0, assets: 0 });
       }
 

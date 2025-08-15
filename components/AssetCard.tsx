@@ -20,7 +20,6 @@ export default function AssetCard({ asset }: AssetCardProps) {
       </div>
       <div className="flex items-center gap-2 mb-1">
         <span className="font-semibold text-lg flex-1 truncate">{asset.name}</span>
-        {asset.price > 0 && <Badge variant="destructive">${asset.price}</Badge>}
       </div>
       <div className="flex flex-wrap gap-1 mb-1">
         <Badge variant="outline">{asset.category.name}</Badge>

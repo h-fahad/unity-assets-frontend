@@ -42,8 +42,6 @@ export default function LandingPageClient() {
     .sort((a, b) => {
       if (sort === "Most Downloaded") return (b.downloadCount || 0) - (a.downloadCount || 0);
       if (sort === "Latest") return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      if (sort === "Price Low to High") return a.price - b.price;
-      if (sort === "Price High to Low") return b.price - a.price;
       return 0;
     });
 

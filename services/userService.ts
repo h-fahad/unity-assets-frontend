@@ -48,6 +48,10 @@ export interface UserProfile {
       billingCycle: string;
     };
   }>;
+  _count?: {
+    downloads: number;
+    assets: number;
+  };
 }
 
 export const userService = {

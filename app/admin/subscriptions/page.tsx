@@ -19,8 +19,6 @@ export default function AdminSubscriptions() {
     userId: 0,
     planId: 0,
     startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    downloadLimit: 100,
   });
 
   useEffect(() => {
@@ -60,8 +58,6 @@ export default function AdminSubscriptions() {
         userId: 0,
         planId: 0,
         startDate: new Date().toISOString().split('T')[0],
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        downloadLimit: 100,
       });
     } catch (error) {
       console.error("Failed to assign subscription:", error);
@@ -135,48 +131,22 @@ export default function AdminSubscriptions() {
                 <option value={0}>Choose a plan...</option>
                 {plans.map(plan => (
                   <option key={plan.id} value={plan.id}>
-                    {plan.name} - ${plan.price} ({plan.durationInDays} days)
+                    {plan.name} - ${plan.basePrice} ({plan.billingCycle}) - {plan.dailyDownloadLimit} downloads/day
                   </option>
                 ))}
               </select>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Start Date
-                </label>
-                <Input
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) => handleInputChange('startDate', e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  End Date
-                </label>
-                <Input
-                  type="date"
-                  value={formData.endDate}
-                  onChange={(e) => handleInputChange('endDate', e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium mb-2">
-                Download Limit (optional)
+                Start Date (optional)
               </label>
               <Input
-                type="number"
-                value={formData.downloadLimit || ''}
-                onChange={(e) => handleInputChange('downloadLimit', parseInt(e.target.value) || 0)}
-                placeholder="Enter download limit"
-                min="0"
+                type="date"
+                value={formData.startDate}
+                onChange={(e) => handleInputChange('startDate', e.target.value)}
               />
+              <p className="text-xs text-gray-500 mt-1">Leave empty to start immediately</p>
             </div>
 
             <Button 

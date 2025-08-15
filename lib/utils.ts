@@ -10,7 +10,7 @@ export function getImageUrl(thumbnail: string | null): string {
     return '/placeholder-asset.svg';
   }
   
-  // If it's already a full URL, return as is
+  // If it's already a full URL (S3 or other CDN), return as is
   if (thumbnail.startsWith('http://') || thumbnail.startsWith('https://')) {
     return thumbnail;
   }
@@ -29,13 +29,15 @@ export function getImageUrl(thumbnail: string | null): string {
     return '/placeholder-asset.svg';
   }
   
-  // If it's a relative path starting with /uploads/, construct the full URL
+  // Legacy support: If it's a relative path starting with /uploads/, construct the full URL
+  // This handles assets uploaded before S3 integration
   if (thumbnail.startsWith('/uploads/')) {
     const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
     return `${API_BASE_URL}${thumbnail}`;
   }
   
-  // If it's just a filename, construct the full URL
+  // Legacy support: If it's just a filename, construct the full URL
+  // This handles assets uploaded before S3 integration
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
   return `${API_BASE_URL}/uploads/${thumbnail}`;
 }

@@ -13,7 +13,7 @@ interface DownloadButtonProps {
 }
 
 export default function DownloadButton({ assetId }: DownloadButtonProps) {
-  const { user, decrementDownload } = useUserStore();
+  const { user, decrementDownload, refreshUser } = useUserStore();
   const router = useRouter();
   const [downloading, setDownloading] = useState(false);
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
@@ -34,9 +34,57 @@ export default function DownloadButton({ assetId }: DownloadButtonProps) {
       document.body.removeChild(link);
       
       toast.success(`Download started for ${result.asset.name}`);
-    } catch (error: unknown) {
-      const errorMsg = error instanceof Error ? error.message : 'Unknown error';
-      toast.error(`Download failed: ${errorMsg}`);
+    } catch (error: any) {
+      let errorMsg = 'Unknown error occurred';
+      
+      if (error.response?.data?.message) {
+        // Handle API error response
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        // Handle general error
+        errorMsg = error.message;
+      }
+      
+      // Handle different types of errors with appropriate styling and actions
+      if (error.response?.status === 403) {
+        if (errorMsg.includes('download limit')) {
+          // Download limit reached
+          toast.error(errorMsg, {
+            duration: 6000,
+            style: {
+              background: '#fee2e2',
+              color: '#991b1b',
+              border: '1px solid #fecaca',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+            icon: '⚠️',
+          });
+          // Refresh user data to update download counts
+          refreshUser();
+        } else if (errorMsg.includes('subscription')) {
+          // Subscription required
+          toast.error(errorMsg, {
+            duration: 5000,
+            style: {
+              background: '#fef3c7',
+              color: '#92400e',
+              border: '1px solid #fde68a',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+            icon: '💳',
+          });
+        } else {
+          // Other forbidden errors
+          toast.error(errorMsg, {
+            duration: 4000,
+            icon: '🚫',
+          });
+        }
+      } else {
+        toast.error(`Download failed: ${errorMsg}`);
+      }
     } finally {
       setDownloading(false);
     }
