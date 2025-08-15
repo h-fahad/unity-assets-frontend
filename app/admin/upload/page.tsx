@@ -9,6 +9,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { categoryService } from "@/services/categoryService";
 import { Category } from "@/types/category";
 import { authService } from "@/lib/auth";
+import { api } from "@/lib/axios";
 
 export default function AdminUploadPage() {
   const { user } = useUserStore();
@@ -74,16 +75,13 @@ export default function AdminUploadPage() {
     formData.append("assetFile", assetFile);
 
     try {
-      const token = authService.getToken();
-      const response = await fetch("http://localhost:3001/assets", {
-        method: "POST",
+      const response = await api.post("/assets", formData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        body: formData,
       });
 
-      if (response.ok) {
+      if (response.status === 200 || response.status === 201) {
         alert("Asset uploaded successfully!");
         // Reset form
         setTitle("");
@@ -94,8 +92,7 @@ export default function AdminUploadPage() {
         setCover(null);
         setAssetFile(null);
       } else {
-        const error = await response.text();
-        alert(`Upload failed: ${error}`);
+        alert(`Upload failed: ${response.statusText}`);
       }
     } catch (error) {
       alert(`Upload failed: ${error}`);
