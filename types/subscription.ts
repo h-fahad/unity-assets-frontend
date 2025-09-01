@@ -1,7 +1,7 @@
 export type BillingCycle = 'WEEKLY' | 'MONTHLY' | 'YEARLY';
 
 export interface SubscriptionPackage {
-  id: number;
+  id: string; // MongoDB ObjectId is a string
   name: string;
   description: string;
   basePrice: number;

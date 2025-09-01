@@ -20,7 +20,7 @@ export const packageService = {
     return plans.filter((plan: SubscriptionPackage) => plan.isActive);
   },
 
-  async getPackage(id: number): Promise<SubscriptionPackage> {
+  async getPackage(id: string): Promise<SubscriptionPackage> {
     const response = await api.get(`/subscriptions/plans/${id}`);
     return response.data;
   },
@@ -30,16 +30,16 @@ export const packageService = {
     return response.data;
   },
 
-  async updatePackage(id: number, data: UpdatePackageData): Promise<SubscriptionPackage> {
+  async updatePackage(id: string, data: UpdatePackageData): Promise<SubscriptionPackage> {
     const response = await api.patch(`/packages/${id}`, data);
     return response.data;
   },
 
-  async deletePackage(id: number): Promise<void> {
+  async deletePackage(id: string): Promise<void> {
     await api.delete(`/packages/${id}`);
   },
 
-  async togglePackageStatus(id: number): Promise<SubscriptionPackage> {
+  async togglePackageStatus(id: string): Promise<SubscriptionPackage> {
     const response = await api.patch(`/packages/${id}/toggle-status`);
     return response.data;
   },
