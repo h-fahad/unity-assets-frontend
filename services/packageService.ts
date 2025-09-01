@@ -8,17 +8,20 @@ import {
 
 export const packageService = {
   async getPackages(): Promise<SubscriptionPackage[]> {
-    const response = await api.get('/packages');
-    return response.data;
+    const response = await api.get('/subscriptions/plans');
+    // API returns { success: true, data: { plans: [...] } }
+    return response.data.data.plans || [];
   },
 
   async getActivePackages(): Promise<SubscriptionPackage[]> {
-    const response = await api.get('/packages/active');
-    return response.data;
+    const response = await api.get('/subscriptions/plans');
+    // API returns { success: true, data: { plans: [...] } }
+    const plans = response.data.data.plans || [];
+    return plans.filter((plan: SubscriptionPackage) => plan.isActive);
   },
 
   async getPackage(id: number): Promise<SubscriptionPackage> {
-    const response = await api.get(`/packages/${id}`);
+    const response = await api.get(`/subscriptions/plans/${id}`);
     return response.data;
   },
 
