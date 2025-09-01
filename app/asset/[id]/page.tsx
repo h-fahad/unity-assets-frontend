@@ -41,7 +41,7 @@ export default async function AssetDetailPage({ params }: AssetDetailPageProps) 
           )}
           <p className="text-gray-700 text-lg mt-2">{asset.description}</p>
           <div className="mt-6">
-            <DownloadButton assetId={asset.id.toString()} />
+            <DownloadButton assetId={asset.id?.toString() || asset._id?.toString() || ''} />
           </div>
         </div>
       </div>

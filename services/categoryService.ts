@@ -1,6 +1,9 @@
 import api from '../lib/axios';
 import { Category, CreateCategoryData, UpdateCategoryData } from '../types/category';
 
+// Re-export types for convenience
+export type { Category, CreateCategoryData, UpdateCategoryData };
+
 export const categoryService = {
   async getCategories(): Promise<Category[]> {
     const response = await api.get('/categories');

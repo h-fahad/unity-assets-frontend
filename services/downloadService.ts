@@ -8,7 +8,7 @@ export interface DownloadRecord {
   downloadedAt: string;
   ipAddress?: string;
   userAgent?: string;
-  assetId: Asset;
+  asset: Asset;
 }
 
 export interface DownloadStatus {

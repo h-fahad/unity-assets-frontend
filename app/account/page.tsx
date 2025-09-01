@@ -117,8 +117,17 @@ export default function AccountPage() {
   };
 
   const handleUpdateProfile = async () => {
+    if (!user) return;
+    
     try {
-      await userService.updateUser(user!.id, editForm);
+      // Use _id (MongoDB) or id (SQL) as fallback
+      const userId = user._id || user.id;
+      if (!userId) {
+        toast.error('User ID not found');
+        return;
+      }
+      
+      await userService.updateUser(userId, editForm);
       setEditing(false);
       loadProfile();
       // Refresh user store with updated data
@@ -134,7 +143,9 @@ export default function AccountPage() {
     authService.logout();
   };
 
-  const getSubscriptionStatus = (subscription: UserProfile['userSubscriptions'][0] | undefined) => {
+  type SubscriptionType = NonNullable<UserProfile['userSubscriptions']>[0];
+
+  const getSubscriptionStatus = (subscription: SubscriptionType | undefined) => {
     if (!subscription) return { status: 'NONE', label: 'No Subscription', color: 'bg-gray-100 text-gray-800' };
     
     const now = new Date();
@@ -147,7 +158,7 @@ export default function AccountPage() {
     }
   };
 
-  const getTimeRemaining = (subscription: UserProfile['userSubscriptions'][0] | undefined) => {
+  const getTimeRemaining = (subscription: SubscriptionType | undefined) => {
     if (!subscription) return null;
     
     const now = new Date();
@@ -178,7 +189,7 @@ export default function AccountPage() {
     );
   }
 
-  const activeSubscription = profile?.userSubscriptions.find(sub => 
+  const activeSubscription = profile?.userSubscriptions?.find(sub => 
     sub.isActive && new Date(sub.endDate) > new Date()
   );
   const subscriptionStatus = getSubscriptionStatus(activeSubscription);

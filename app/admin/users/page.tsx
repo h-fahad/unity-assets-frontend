@@ -201,7 +201,12 @@ export default function AdminUsers() {
 
     setIsDeleting(true);
     try {
-      await userService.deleteUser(deleteUser._id || deleteUser.id);
+      const userId = deleteUser._id || deleteUser.id;
+      if (!userId) {
+        toast.error('User ID not found');
+        return;
+      }
+      await userService.deleteUser(userId);
       loadUsers();
       loadStats();
       toast.success("User deleted successfully!");
@@ -234,7 +239,12 @@ export default function AdminUsers() {
 
   const handleActivateUser = async (userData: UserWithStats) => {
     try {
-      await userService.activateUser(userData._id || userData.id);
+      const userId = userData._id || userData.id;
+      if (!userId) {
+        toast.error('User ID not found');
+        return;
+      }
+      await userService.activateUser(userId);
       loadUsers();
       loadStats();
       toast.success("User activated successfully!");
@@ -250,7 +260,12 @@ export default function AdminUsers() {
 
     setIsChangingStatus(true);
     try {
-      await userService.deactivateUser(statusUser._id || statusUser.id);
+      const userId = statusUser._id || statusUser.id;
+      if (!userId) {
+        toast.error('User ID not found');
+        return;
+      }
+      await userService.deactivateUser(userId);
       loadUsers();
       loadStats();
       toast.success("User deactivated successfully!");
@@ -269,11 +284,17 @@ export default function AdminUsers() {
 
     setIsChangingStatus(true);
     try {
+      const userId = statusUser._id || statusUser.id;
+      if (!userId) {
+        toast.error('User ID not found');
+        return;
+      }
+      
       if (statusUser.isActive) {
-        await userService.deactivateUser(statusUser._id || statusUser.id);
+        await userService.deactivateUser(userId);
         toast.success("User deactivated successfully!");
       } else {
-        await userService.activateUser(statusUser._id || statusUser.id);
+        await userService.activateUser(userId);
         toast.success("User activated successfully!");
       }
       loadUsers();
@@ -320,7 +341,12 @@ export default function AdminUsers() {
     if (!editingUser) return;
 
     try {
-      await userService.updateUser(editingUser._id || editingUser.id, editForm);
+      const userId = editingUser._id || editingUser.id;
+      if (!userId) {
+        toast.error('User ID not found');
+        return;
+      }
+      await userService.updateUser(userId, editForm);
       
       // Reset form
       setShowEditForm(false);
@@ -780,9 +806,12 @@ export default function AdminUsers() {
                         <Button
                           size="sm"
                           variant="outline"
-                          onClick={() =>
-                            handleChangeRole(userData._id || userData.id, userData.role)
-                          }
+                          onClick={() => {
+                            const userId = userData._id || userData.id;
+                            if (userId) {
+                              handleChangeRole(userId, userData.role);
+                            }
+                          }}
                           title={
                             userData.role === "ADMIN"
                               ? "Make User"

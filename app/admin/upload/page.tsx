@@ -60,7 +60,7 @@ export default function AdminUploadPage() {
       const categoriesData = await categoryService.getActiveCategories();
       setCategories(categoriesData);
       if (categoriesData.length > 0 && !categoryId) {
-        setCategoryId(categoriesData[0]._id);
+        setCategoryId(categoriesData[0]._id || null);
       }
     } catch (error) {
       console.error("Failed to load categories:", error);
@@ -156,7 +156,7 @@ export default function AdminUploadPage() {
         // Reset form
         setTitle("");
         setDescription("");
-        setCategoryId(categories.length > 0 ? categories[0]._id : null);
+        setCategoryId(categories.length > 0 ? (categories[0]._id || null) : null);
         setTags("");
         setTagArray([]);
         setIsPremium(false);

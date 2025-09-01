@@ -279,7 +279,7 @@ export default function AdminCategories() {
                 </div>
                 <div className="flex items-center gap-2">
                   <FileText className="w-4 h-4" />
-                  <span>Created: {new Date(category.createdAt).toLocaleDateString()}</span>
+                  <span>Created: {category.createdAt ? new Date(category.createdAt).toLocaleDateString() : 'N/A'}</span>
                 </div>
               </div>
             </CardContent>
