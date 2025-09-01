@@ -132,7 +132,7 @@ export default function AdminPackages() {
     setShowCreateForm(true);
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this package?")) return;
     
     try {
@@ -145,7 +145,7 @@ export default function AdminPackages() {
     }
   };
 
-  const handleToggleStatus = async (id: number) => {
+  const handleToggleStatus = async (id: string) => {
     try {
       await packageService.togglePackageStatus(id);
       await loadPackages();
