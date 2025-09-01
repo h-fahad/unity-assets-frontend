@@ -1,11 +1,12 @@
 export interface Category {
   id: number;
+  _id?: string; // For backward compatibility
   name: string;
   description: string;
   slug: string;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
   _count?: {
     assets: number;
   };

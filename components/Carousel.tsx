@@ -63,19 +63,33 @@ export default function Carousel() {
     );
   }
 
+  const currentAsset = assets[current];
+  
+  if (!currentAsset) {
+    return (
+      <div className="relative w-full max-w-2xl mx-auto mb-8">
+        <div className="overflow-hidden rounded-xl border bg-gray-100 shadow">
+          <div className="w-full h-64 flex items-center justify-center">
+            <span className="text-gray-500">No asset data available</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full max-w-2xl mx-auto mb-8">
       <div className="overflow-hidden rounded-xl border bg-white shadow">
         <Image
-          src={getImageUrl(assets[current].thumbnail)}
-          alt={assets[current].name}
+          src={getImageUrl(currentAsset.thumbnail)}
+          alt={currentAsset.name}
           width={800}
           height={256}
           className="w-full h-64 object-cover object-center"
         />
         <div className="absolute bottom-4 left-0 right-0 flex justify-center">
           <span className="bg-black/70 text-white px-4 py-1 rounded text-lg font-semibold">
-            {assets[current].name}
+            {currentAsset.name}
           </span>
         </div>
       </div>

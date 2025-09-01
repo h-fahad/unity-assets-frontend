@@ -1,7 +1,8 @@
 import api from '../lib/axios';
 
 export interface Asset {
-  id: number;
+  _id: string;
+  id?: number; // For backward compatibility
   name: string;
   description: string;
   fileUrl: string;
@@ -11,19 +12,21 @@ export interface Asset {
   downloadCount: number;
   createdAt: string;
   updatedAt: string;
-  categoryId: number;
-  uploadedById: number;
+  categoryId: string;
+  uploadedById?: number;
   uploadedBy: {
-    id: number;
-    email: string;
+    _id?: string;
+    id?: number;
+    email?: string;
     name: string;
   };
   category: {
-    id: number;
+    _id?: string;
+    id?: number;
     name: string;
     slug: string;
   };
-  _count: {
+  _count?: {
     downloads: number;
   };
 }
@@ -41,7 +44,32 @@ export interface UpdateAssetData extends Partial<CreateAssetData> {}
 export const assetService = {
   async getAssets(): Promise<Asset[]> {
     const response = await api.get('/assets');
-    return response.data.assets;
+    return response.data.data?.assets || response.data.assets || [];
+  },
+
+  async getAllAssets(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    category?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<{ assets: Asset[]; pagination?: any }> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.category) queryParams.append('category', params.category);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+    const url = `/assets${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await api.get(url);
+    // Handle MERN backend response format
+    return response.data.data || response.data;
   },
 
   async getAsset(id: number): Promise<Asset> {
@@ -64,18 +92,33 @@ export const assetService = {
     return response.data;
   },
 
-  async deleteAsset(id: number): Promise<void> {
+  async deleteAsset(id: number | string): Promise<void> {
     await api.delete(`/assets/${id}`);
   },
 
-  async downloadAsset(id: number): Promise<{ downloadUrl: string; asset: Asset; message: string }> {
-    const response = await api.post(`/assets/${id}/download`);
-    return response.data;
+  async toggleAssetStatus(id: number | string): Promise<Asset> {
+    const response = await api.patch(`/assets/${id}/status`);
+    return response.data.data?.asset || response.data.asset || response.data;
+  },
+
+  async getAssetStats(): Promise<{
+    total: number;
+    active: number;
+    inactive: number;
+    totalDownloads: number;
+  }> {
+    const response = await api.get('/assets/stats');
+    return response.data.data || response.data;
+  },
+
+  async downloadAsset(id: number | string): Promise<{ downloadUrl: string; asset: Asset; message: string; remainingDownloads?: number; downloadLimit?: number }> {
+    const response = await api.post(`/downloads/${id}`);
+    return response.data.data || response.data;
   },
 
   async getFeaturedAssets(): Promise<Asset[]> {
     const response = await api.get('/assets/featured');
-    return response.data.assets || response.data;
+    return response.data.data?.assets || response.data.assets || [];
   },
 
   async getAssetsByCategory(category: string): Promise<Asset[]> {

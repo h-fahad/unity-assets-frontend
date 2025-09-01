@@ -1,12 +1,16 @@
 import api from './axios';
 
 export interface User {
-  id: number;
+  _id?: string;
+  id?: number; // For backward compatibility
   email: string;
   name?: string;
   role: 'USER' | 'ADMIN';
+  isActive: boolean;
   createdAt: string;
   updatedAt: string;
+  resetToken?: string | null;
+  resetTokenExpiry?: string | null;
 }
 
 export interface LoginData {
@@ -28,23 +32,63 @@ export interface AuthResponse {
 
 export const authService = {
   async login(data: LoginData): Promise<AuthResponse> {
-    const response = await api.post('/auth/login', data);
-    const { access_token, user } = response.data;
-    
-    localStorage.setItem('token', access_token);
-    localStorage.setItem('user', JSON.stringify(user));
-    
-    return { access_token, user };
+    try {
+      const response = await api.post('/auth/login', data);
+      
+      // Handle MERN backend response format
+      if (response.data.success === false) {
+        throw new Error(response.data.message || 'Login failed');
+      }
+      
+      // MERN backend returns data in response.data.data
+      const authData = response.data.data || response.data;
+      const { access_token, user } = authData;
+      
+      localStorage.setItem('token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+      
+      return { access_token, user };
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Login failed');
+    }
   },
 
   async register(data: RegisterData): Promise<User> {
-    const response = await api.post('/auth/register', data);
-    return response.data;
+    try {
+      const response = await api.post('/auth/register', data);
+      
+      // Handle MERN backend response format
+      if (response.data.success === false) {
+        throw new Error(response.data.message || 'Registration failed');
+      }
+      
+      // MERN backend returns data in response.data.data
+      const authData = response.data.data || response.data;
+      return authData.user || authData;
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Registration failed');
+    }
   },
 
   async getProfile(): Promise<User> {
     const response = await api.get('/users/profile');
-    return response.data;
+    
+    // Handle MERN backend response format
+    if (response.data.success === false) {
+      throw new Error(response.data.message || 'Failed to get profile');
+    }
+    
+    // MERN backend returns data in response.data.data
+    const profileData = response.data.data || response.data;
+    return profileData.user || profileData;
   },
 
   logout() {

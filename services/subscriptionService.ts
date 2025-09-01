@@ -45,7 +45,9 @@ export interface AssignSubscriptionData {
 export const subscriptionService = {
   async getPlans(): Promise<SubscriptionPlan[]> {
     const response = await api.get('/subscriptions/plans');
-    return response.data;
+    // Handle MERN backend response format
+    const data = response.data.data || response.data;
+    return data.plans || data;
   },
 
   async createPlan(data: CreatePlanData): Promise<SubscriptionPlan> {
@@ -84,7 +86,8 @@ export const subscriptionService = {
 
   async getAdminStats(): Promise<any> {
     const response = await api.get('/subscriptions/admin/stats');
-    return response.data;
+    // Handle MERN backend response format
+    return response.data.data || response.data;
   }
 };
 

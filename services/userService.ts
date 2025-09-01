@@ -14,33 +14,37 @@ export interface CreateUserData {
 }
 
 export interface UserWithStats {
-  id: number;
+  _id: string;
+  id?: number; // For backward compatibility
   name?: string;
   email: string;
   role: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
-  userSubscriptions: any[];
-  _count: {
+  userSubscriptions?: any[];
+  _count?: {
     downloads: number;
     assets: number;
   };
 }
 
 export interface UserProfile {
-  id: number;
+  _id?: string;
+  id?: number; // For backward compatibility
   name?: string;
   email: string;
   role: string;
   createdAt: string;
-  userSubscriptions: Array<{
-    id: number;
+  userSubscriptions?: Array<{
+    _id?: string;
+    id?: number;
     startDate: string;
     endDate: string;
     isActive: boolean;
     plan: {
-      id: number;
+      _id?: string;
+      id?: number;
       name: string;
       description?: string;
       dailyDownloadLimit: number;
@@ -57,46 +61,119 @@ export interface UserProfile {
 export const userService = {
   async getProfile(): Promise<UserProfile> {
     const response = await api.get('/users/profile');
-    return response.data;
+    // Handle MERN backend response format
+    const profileData = response.data.data || response.data;
+    return profileData.user || profileData;
   },
 
-  async getUser(id: number): Promise<User> {
+  async getUser(id: string): Promise<User> {
     const response = await api.get(`/users/${id}`);
-    return response.data;
+    return response.data; // NestJS backend returns data directly
   },
 
-  async getAllUsers(): Promise<{ users: UserWithStats[]; pagination: any }> {
-    const response = await api.get('/users');
-    return response.data;
+  async getAllUsers(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    role?: string;
+    status?: string;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<{ users: UserWithStats[]; pagination?: any }> {
+    const queryParams = new URLSearchParams();
+    
+    if (params?.page) queryParams.append('page', params.page.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.role) queryParams.append('role', params.role);
+    if (params?.status) queryParams.append('status', params.status);
+    if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+    const url = `/users${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
+    const response = await api.get(url);
+    // Handle MERN backend response format
+    return response.data.data || response.data;
   },
 
   async createUser(data: CreateUserData): Promise<User> {
-    const response = await api.post('/users', data);
-    return response.data;
+    try {
+      const response = await api.post('/users', data);
+      // Handle MERN backend response format
+      const userData = response.data.data?.user || response.data.user || response.data;
+      return userData;
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Failed to create user');
+    }
   },
 
-  async updateUser(id: number, data: UpdateUserData): Promise<User> {
-    const response = await api.patch(`/users/${id}`, data);
-    return response.data;
+  async updateUser(id: string | number, data: UpdateUserData): Promise<User> {
+    try {
+      const response = await api.put(`/users/${id}`, data);
+      // Handle MERN backend response format
+      const userData = response.data.data?.user || response.data.user || response.data;
+      return userData;
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Failed to update user');
+    }
   },
 
-  async deleteUser(id: number): Promise<void> {
-    await api.delete(`/users/${id}`);
+  async deleteUser(id: string | number): Promise<void> {
+    try {
+      await api.delete(`/users/${id}`);
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Failed to delete user');
+    }
   },
 
-  async activateUser(id: number): Promise<User> {
-    const response = await api.patch(`/users/${id}/activate`);
-    return response.data;
+  async activateUser(id: string | number): Promise<User> {
+    return this.toggleUserStatus(id, true);
   },
 
-  async deactivateUser(id: number): Promise<User> {
-    const response = await api.patch(`/users/${id}/deactivate`);
-    return response.data;
+  async deactivateUser(id: string | number): Promise<User> {
+    return this.toggleUserStatus(id, false);
   },
 
-  async changeUserRole(id: number, role: 'USER' | 'ADMIN'): Promise<User> {
-    const response = await api.patch(`/users/${id}/role`, { role });
-    return response.data;
+  async toggleUserStatus(id: string | number, isActive: boolean): Promise<User> {
+    try {
+      const response = await api.patch(`/users/${id}/status`, { isActive });
+      // Handle MERN backend response format
+      const userData = response.data.data?.user || response.data.user || response.data;
+      return userData;
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Failed to update user status');
+    }
+  },
+
+  async changeUserRole(id: string | number, role: 'USER' | 'ADMIN'): Promise<User> {
+    try {
+      const response = await api.patch(`/users/${id}/role`, { role });
+      // Handle MERN backend response format
+      const userData = response.data.data?.user || response.data.user || response.data;
+      return userData;
+    } catch (error: any) {
+      // Extract error message from axios error response
+      if (error.response?.data?.message) {
+        throw new Error(error.response.data.message);
+      }
+      throw new Error(error.message || 'Failed to change user role');
+    }
   },
 
   async searchUsers(query: string): Promise<{ users: UserWithStats[]; pagination: any }> {
@@ -106,7 +183,8 @@ export const userService = {
 
   async getUserStats(): Promise<any> {
     const response = await api.get('/users/stats');
-    return response.data;
+    // Handle MERN backend response format
+    return response.data.data || response.data;
   },
 
   async getUsersWithSubscriptions(): Promise<any[]> {

@@ -4,12 +4,12 @@ import { Category, CreateCategoryData, UpdateCategoryData } from '../types/categ
 export const categoryService = {
   async getCategories(): Promise<Category[]> {
     const response = await api.get('/categories');
-    return response.data;
+    return response.data.data?.categories || response.data.categories || response.data || [];
   },
 
   async getActiveCategories(): Promise<Category[]> {
     const response = await api.get('/categories/active');
-    return response.data;
+    return response.data.data?.categories || response.data.categories || response.data || [];
   },
 
   async getCategory(id: number): Promise<Category> {

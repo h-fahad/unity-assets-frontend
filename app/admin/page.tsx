@@ -199,6 +199,13 @@ export default function AdminDashboard() {
               <Button 
                 variant="outline" 
                 className="w-full"
+                onClick={() => router.push("/admin/assets")}
+              >
+                Manage Assets
+              </Button>
+              <Button 
+                variant="outline" 
+                className="w-full"
                 onClick={() => router.push("/admin/subscriptions")}
               >
                 Create Subscription

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -26,9 +26,17 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/signin';
+      // Don't clear tokens or redirect for login/register endpoints
+      const isAuthEndpoint = error.config?.url?.includes('/auth/');
+      
+      if (!isAuthEndpoint) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        // Only redirect if not already on signin page
+        if (window.location.pathname !== '/signin') {
+          window.location.href = '/signin';
+        }
+      }
     }
     return Promise.reject(error);
   }

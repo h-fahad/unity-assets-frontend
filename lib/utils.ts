@@ -30,14 +30,14 @@ export function getImageUrl(thumbnail: string | null): string {
   }
   
   // Legacy support: If it's a relative path starting with /uploads/, construct the full URL
-  // This handles assets uploaded before S3 integration
+  // This handles assets uploaded before S3 integration (fallback for any remaining local files)
   if (thumbnail.startsWith('/uploads/')) {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+    const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api').replace('/api', '');
     return `${API_BASE_URL}${thumbnail}`;
   }
   
   // Legacy support: If it's just a filename, construct the full URL
-  // This handles assets uploaded before S3 integration
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+  // This handles assets uploaded before S3 integration (fallback for any remaining local files)
+  const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api').replace('/api', '');
   return `${API_BASE_URL}/uploads/${thumbnail}`;
 }

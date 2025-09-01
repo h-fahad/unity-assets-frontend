@@ -18,9 +18,16 @@ export default function AssetFilters({ category, sort, onCategoryChange, onSortC
     async function fetchCategories() {
       try {
         const categoriesData = await categoryService.getActiveCategories();
-        setCategories(categoriesData);
+        // Ensure we have an array
+        if (Array.isArray(categoriesData)) {
+          setCategories(categoriesData);
+        } else {
+          console.error("Expected array but got:", categoriesData);
+          setCategories([]);
+        }
       } catch (error) {
         console.error("Failed to load categories:", error);
+        setCategories([]);
       }
     }
     fetchCategories();
@@ -35,7 +42,7 @@ export default function AssetFilters({ category, sort, onCategoryChange, onSortC
       >
         <option value="">All Categories</option>
         {categories.map(cat => (
-          <option key={cat.id} value={cat.name}>{cat.name}</option>
+          <option key={cat._id || cat.id} value={cat.name}>{cat.name}</option>
         ))}
       </select>
       <select
