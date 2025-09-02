@@ -36,6 +36,11 @@ export default function SubscriptionPackages() {
   const [selectedBillingCycle, setSelectedBillingCycle] =
     useState<BillingCycle>("MONTHLY");
 
+  // Calculate maximum yearly discount for the badge
+  const maxYearlyDiscount = packages.length > 0 
+    ? Math.max(...packages.map(pkg => pkg.yearlyDiscount))
+    : 0;
+
   useEffect(() => {
     loadPackages();
   }, []);
@@ -56,10 +61,6 @@ export default function SubscriptionPackages() {
       // If showing yearly price for a monthly package
       const yearlyBase = pkg.basePrice * 12;
       return yearlyBase * (1 - pkg.yearlyDiscount / 100);
-    }
-    if (cycle === "WEEKLY" && pkg.billingCycle === "MONTHLY") {
-      // If showing weekly price for a monthly package
-      return pkg.basePrice / 4;
     }
     return pkg.basePrice;
   };
@@ -177,7 +178,7 @@ export default function SubscriptionPackages() {
 
         {/* Billing Cycle Toggle */}
         <div className="inline-flex bg-gray-100 rounded-lg p-1">
-          {(["WEEKLY", "MONTHLY", "YEARLY"] as BillingCycle[]).map((cycle) => (
+          {(["MONTHLY", "YEARLY"] as BillingCycle[]).map((cycle) => (
             <button
               key={cycle}
               onClick={() => setSelectedBillingCycle(cycle)}
@@ -187,14 +188,10 @@ export default function SubscriptionPackages() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              {cycle === "WEEKLY"
-                ? "Weekly"
-                : cycle === "MONTHLY"
-                ? "Monthly"
-                : "Yearly"}
-              {cycle === "YEARLY" && (
+              {cycle === "MONTHLY" ? "Monthly" : "Yearly"}
+              {cycle === "YEARLY" && maxYearlyDiscount > 0 && (
                 <Badge className="ml-2 bg-green-100 text-green-800">
-                  Save up to 20%
+                  Save up to {maxYearlyDiscount}%
                 </Badge>
               )}
             </button>
@@ -300,15 +297,6 @@ export default function SubscriptionPackages() {
                 >
                   {user ? "Subscribe Now" : "Sign In to Subscribe"}
                 </Button>
-                {user && user.role !== "ADMIN" && (
-                  <Button
-                    variant="outline"
-                    className="w-full text-xs"
-                    onClick={() => handleManualSubscribe(pkg)}
-                  >
-                    Test: Create Subscription
-                  </Button>
-                )}
               </CardFooter>
             </Card>
           );
