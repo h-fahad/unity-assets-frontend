@@ -131,8 +131,8 @@ export default function LandingPageClient() {
             <div className="sm:hidden">
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
                 {featured.map(asset => (
-                  <div key={asset._id || asset.id} className="min-w-[280px] flex-shrink-0 snap-center">
-                    <AssetCard asset={asset} />
+                  <div key={asset._id || asset.id} className="min-w-[320px] flex-shrink-0 snap-center">
+                    <AssetCard asset={asset} isFeatured={true} />
                   </div>
                 ))}
               </div>
@@ -140,8 +140,8 @@ export default function LandingPageClient() {
             
             <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {featured.map(asset => (
-                <div key={asset._id || asset.id} className="transform hover:scale-105 transition-transform duration-300">
-                  <AssetCard asset={asset} />
+                <div key={asset._id || asset.id}>
+                  <AssetCard asset={asset} isFeatured={true} />
                 </div>
               ))}
             </div>
@@ -191,9 +191,7 @@ export default function LandingPageClient() {
             <div className="space-y-6 sm:space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {filtered.map(asset => (
-                  <div key={asset._id || asset.id} className="transform hover:scale-105 transition-all duration-300 hover:shadow-xl">
-                    <AssetCard asset={asset} />
-                  </div>
+                  <AssetCard key={asset._id || asset.id} asset={asset} />
                 ))}
               </div>
               
