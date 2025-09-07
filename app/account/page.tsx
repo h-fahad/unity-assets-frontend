@@ -84,8 +84,7 @@ export default function AccountPage() {
         setStats({ downloads: 0, assets: 0 });
       }
 
-      // Refresh user store to get updated subscription info
-      useUserStore.getState().refreshUser();
+      // Note: We already fetched fresh profile data above, so no need to call refreshUser() again
     } catch (error) {
       console.error('Failed to load profile from API, using stored data:', error);
       
@@ -129,9 +128,7 @@ export default function AccountPage() {
       
       await userService.updateUser(userId, editForm);
       setEditing(false);
-      loadProfile();
-      // Refresh user store with updated data
-      useUserStore.getState().refreshUser();
+      await loadProfile(); // This already fetches the updated profile data
       toast.success('Profile updated successfully!');
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
