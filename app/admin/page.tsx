@@ -35,19 +35,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load user from localStorage on mount
-    if (!user) {
-      useUserStore.getState().loadUser();
-      return;
-    }
-
-    if (user.role !== "ADMIN") {
-      router.push("/");
-      return;
-    }
-
+    // Admin protection is handled by layout, just load stats
     loadStats();
-  }, [user, router]);
+  }, []);
 
   const loadStats = async () => {
     try {
@@ -84,14 +74,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (user.role !== "ADMIN") {
-    return (
-      <main className="max-w-xl mx-auto py-16 px-4 text-center">
-        <h1 className="text-2xl font-bold mb-4">Not authorized</h1>
-        <p>You must be logged in as an admin to view this page.</p>
-      </main>
-    );
-  }
+  // Admin protection is handled by layout
 
   if (loading) {
     return (

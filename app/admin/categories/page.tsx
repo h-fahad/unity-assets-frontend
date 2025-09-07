@@ -28,6 +28,7 @@ export default function AdminCategories() {
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState<Set<number>>(new Set());
   const [formData, setFormData] = useState<CreateCategoryData>({
     name: '',
     description: '',
@@ -125,6 +126,23 @@ export default function AdminCategories() {
     }));
   };
 
+  const toggleDescription = (categoryId: number) => {
+    setExpandedDescriptions(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
+  };
+
+  const truncateText = (text: string, maxLength: number = 120) => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  };
+
   if (!user || user.role !== "ADMIN") {
     return (
       <main className="max-w-xl mx-auto py-16 px-4 text-center">
@@ -219,72 +237,91 @@ export default function AdminCategories() {
 
       {/* Categories List */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((category) => (
-          <Card key={category.id} className={`relative ${!category.isActive ? 'opacity-60' : ''}`}>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <CardTitle className="flex items-center gap-2 mb-2">
-                    <Tag className="w-5 h-5" />
-                    {category.name}
-                  </CardTitle>
-                  <div className="flex gap-2 mb-2">
-                    <Badge variant={category.isActive ? "default" : "secondary"}>
-                      {category.isActive ? "Active" : "Inactive"}
-                    </Badge>
-                    {category._count && (
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <BarChart className="w-3 h-3" />
-                        {category._count.assets} assets
+        {categories.map((category) => {
+          const isExpanded = expandedDescriptions.has(category.id);
+          const shouldShowToggle = category.description.length > 120;
+          
+          return (
+            <Card key={category.id} className={`relative flex flex-col h-full overflow-hidden ${!category.isActive ? 'opacity-60' : ''}`}>
+              <CardHeader className="flex-shrink-0 p-4">
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="flex items-center gap-2 mb-2 text-lg">
+                      <Tag className="w-5 h-5 flex-shrink-0" />
+                      <span className="truncate">{category.name}</span>
+                    </CardTitle>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      <Badge variant={category.isActive ? "default" : "secondary"}>
+                        {category.isActive ? "Active" : "Inactive"}
                       </Badge>
+                      {category._count && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <BarChart className="w-3 h-3" />
+                          {category._count.assets} assets
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleToggleStatus(category.id)}
+                      title={category.isActive ? "Deactivate" : "Activate"}
+                    >
+                      {category.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleEdit(category)}
+                      title="Edit"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(category.id)}
+                      className="text-red-500"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="flex-grow flex flex-col p-4 pt-0">
+                <div className="flex-grow">
+                  <div className="text-gray-600 mb-4">
+                    <p className="leading-relaxed">
+                      {isExpanded ? category.description : truncateText(category.description)}
+                    </p>
+                    {shouldShowToggle && (
+                      <button
+                        onClick={() => toggleDescription(category.id)}
+                        className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 focus:outline-none focus:underline"
+                      >
+                        {isExpanded ? 'See less' : 'See more'}
+                      </button>
                     )}
                   </div>
                 </div>
-                <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleToggleStatus(category.id)}
-                    title={category.isActive ? "Deactivate" : "Activate"}
-                  >
-                    {category.isActive ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleEdit(category)}
-                    title="Edit"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDelete(category.id)}
-                    className="text-red-500"
-                    title="Delete"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                
+                <div className="space-y-2 text-sm text-gray-500 mt-auto">
+                  <div className="flex items-center gap-2">
+                    <Hash className="w-4 h-4 flex-shrink-0" />
+                    <span className="break-all text-xs">Slug: {category.slug}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 flex-shrink-0" />
+                    <span className="text-xs">Created: {category.createdAt ? new Date(category.createdAt).toLocaleDateString() : 'N/A'}</span>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600 mb-4">{category.description}</p>
-              
-              <div className="space-y-2 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <Hash className="w-4 h-4" />
-                  <span>Slug: {category.slug}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  <span>Created: {category.createdAt ? new Date(category.createdAt).toLocaleDateString() : 'N/A'}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {categories.length === 0 && (
