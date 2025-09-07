@@ -50,6 +50,48 @@ export default function DownloadButton({ assetId }: DownloadButtonProps) {
   const handleDownload = async () => {
     setDownloading(true);
     try {
+      // Check current download status before attempting download
+      const currentStatus = await downloadService.getDownloadStatus();
+      setDownloadStatus(currentStatus);
+      
+      // If user cannot download based on current status, prevent download
+      if (!currentStatus.canDownload && !currentStatus.isAdmin) {
+        let errorMsg = currentStatus.message;
+        
+        if (currentStatus.remainingDownloads === 0) {
+          toast.error(errorMsg, {
+            duration: 6000,
+            style: {
+              background: '#fee2e2',
+              color: '#991b1b',
+              border: '1px solid #fecaca',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+            icon: '⚠️',
+          });
+        } else if (!currentStatus.hasSubscription) {
+          toast.error(errorMsg, {
+            duration: 5000,
+            style: {
+              background: '#fef3c7',
+              color: '#92400e',
+              border: '1px solid #fde68a',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+            icon: '💳',
+          });
+        } else {
+          toast.error(errorMsg, {
+            duration: 4000,
+            icon: '🚫',
+          });
+        }
+        setDownloading(false);
+        return;
+      }
+      
       const result = await downloadService.downloadAsset(assetId);
       
       // Create a temporary download link
