@@ -7,6 +7,8 @@ export interface Asset {
   description: string;
   fileUrl: string;
   thumbnail: string;
+  imageUrl?: string;
+  fileSize?: number;
   tags: string[];
   isActive: boolean;
   downloadCount: number;
@@ -39,7 +41,13 @@ export interface CreateAssetData {
   thumbnail: string;
 }
 
-export interface UpdateAssetData extends Partial<CreateAssetData> {}
+export interface UpdateAssetData {
+  name?: string;
+  description?: string;
+  categoryId?: string;
+  isActive?: boolean;
+  tags?: string[];
+}
 
 export const assetService = {
   async getAssets(): Promise<Asset[]> {
@@ -55,7 +63,7 @@ export const assetService = {
     status?: string;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
-  }): Promise<{ assets: Asset[]; pagination?: any }> {
+  }): Promise<{ assets: Asset[]; pagination?: { page: number; limit: number; total: number; pages: number } }> {
     const queryParams = new URLSearchParams();
     
     if (params?.page) queryParams.append('page', params.page.toString());
@@ -77,6 +85,11 @@ export const assetService = {
     return response.data;
   },
 
+  async getAssetById(id: string | number): Promise<Asset> {
+    const response = await api.get(`/assets/${id}`);
+    return response.data.data?.asset || response.data.asset || response.data;
+  },
+
   async searchAssets(query: string): Promise<Asset[]> {
     const response = await api.get(`/assets/search/${encodeURIComponent(query)}`);
     return response.data.assets || response.data;
@@ -87,9 +100,9 @@ export const assetService = {
     return response.data;
   },
 
-  async updateAsset(id: number, data: UpdateAssetData): Promise<Asset> {
+  async updateAsset(id: string | number, data: UpdateAssetData): Promise<Asset> {
     const response = await api.patch(`/assets/${id}`, data);
-    return response.data;
+    return response.data.data?.asset || response.data.asset || response.data;
   },
 
   async deleteAsset(id: number | string): Promise<void> {
