@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AssetCard from "@/components/AssetCard";
 import AssetFilters from "@/components/AssetFilters";
 import { assetService, type Asset } from "@/services/assetService";
+import { useUserStore } from "@/store/useUserStore";
 import Carousel from "@/components/Carousel";
 
 export default function LandingPageClient() {
+  const router = useRouter();
+  const { user } = useUserStore();
   const [assets, setAssets] = useState<Asset[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -50,6 +54,22 @@ export default function LandingPageClient() {
     .sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0))
     .slice(0, 3);
 
+  const handleBrowseAssets = () => {
+    const assetsSection = document.getElementById('assets-section');
+    if (assetsSection) {
+      assetsSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback: scroll to bottom of page where assets are
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
+  const handleStartCreating = () => {
+    if (user && user.role === 'ADMIN') {
+      router.push('/admin/upload');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Hero Section */}
@@ -66,12 +86,20 @@ export default function LandingPageClient() {
               <span className="hidden sm:inline"> Browse thousands of high-quality assets from talented creators worldwide.</span>
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4">
-              <button className="w-full sm:w-auto bg-white text-indigo-600 hover:bg-gray-100 font-semibold py-3 px-6 sm:px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl">
+              <button 
+                onClick={handleBrowseAssets}
+                className="w-full sm:w-auto bg-white text-indigo-600 hover:bg-gray-100 font-semibold py-3 px-6 sm:px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
                 Browse Assets
               </button>
-              <button className="w-full sm:w-auto bg-transparent border-2 border-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-6 sm:px-8 rounded-full transition-all duration-300">
-                Start Creating
-              </button>
+              {user && user.role === 'ADMIN' && (
+                <button 
+                  onClick={handleStartCreating}
+                  className="w-full sm:w-auto bg-transparent border-2 border-white hover:bg-white hover:text-indigo-600 font-semibold py-3 px-6 sm:px-8 rounded-full transition-all duration-300"
+                >
+                  Start Creating
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -122,7 +150,7 @@ export default function LandingPageClient() {
       )}
 
       {/* Main Content Section */}
-      <section className="py-8 sm:py-12 lg:py-16">
+      <section id="assets-section" className="py-8 sm:py-12 lg:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Filters */}
           <div className="mb-8 sm:mb-12">
