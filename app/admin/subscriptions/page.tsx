@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { subscriptionService, type SubscriptionPlan, type AssignSubscriptionData } from "@/services/subscriptionService";
 import { userService, type UserWithStats } from "@/services/userService";
+import toast from "react-hot-toast";
 
 export default function AdminSubscriptions() {
   const { user } = useUserStore();
@@ -16,8 +17,8 @@ export default function AdminSubscriptions() {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<AssignSubscriptionData>({
-    userId: 0,
-    planId: 0,
+    userId: "",
+    planId: "",
     startDate: new Date().toISOString().split('T')[0],
   });
 
@@ -36,7 +37,9 @@ export default function AdminSubscriptions() {
         userService.getAllUsers(),
         subscriptionService.getPlans(),
       ]);
-      setUsers(usersData.users);
+      // Filter out admin users - they don't need subscriptions
+      const nonAdminUsers = usersData.users.filter(user => user.role !== "ADMIN");
+      setUsers(nonAdminUsers);
       setPlans(plansData);
     } catch (error) {
       console.error("Failed to load data:", error);
@@ -46,22 +49,22 @@ export default function AdminSubscriptions() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.userId || !formData.planId) {
-      alert("Please select both user and plan");
+      toast.error("Please select both user and plan");
       return;
     }
 
     setLoading(true);
     try {
       await subscriptionService.assignPlan(formData);
-      alert("Subscription assigned successfully!");
+      toast.success("Subscription assigned successfully!");
       setFormData({
-        userId: 0,
-        planId: 0,
+        userId: "",
+        planId: "",
         startDate: new Date().toISOString().split('T')[0],
       });
     } catch (error) {
       console.error("Failed to assign subscription:", error);
-      alert("Failed to assign subscription. Please try again.");
+      toast.error("Failed to assign subscription. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -105,13 +108,13 @@ export default function AdminSubscriptions() {
               </label>
               <select
                 value={formData.userId}
-                onChange={(e) => handleInputChange('userId', parseInt(e.target.value))}
+                onChange={(e) => handleInputChange('userId', e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
-                <option value={0}>Choose a user...</option>
+                <option value="">Choose a user...</option>
                 {users.map(user => (
-                  <option key={user.id} value={user.id}>
+                  <option key={user._id || user.id} value={user._id || user.id}>
                     {user.name || user.email} ({user.email})
                   </option>
                 ))}
@@ -124,13 +127,13 @@ export default function AdminSubscriptions() {
               </label>
               <select
                 value={formData.planId}
-                onChange={(e) => handleInputChange('planId', parseInt(e.target.value))}
+                onChange={(e) => handleInputChange('planId', e.target.value)}
                 className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 required
               >
-                <option value={0}>Choose a plan...</option>
+                <option value="">Choose a plan...</option>
                 {plans.map(plan => (
-                  <option key={plan.id} value={plan.id}>
+                  <option key={plan._id || plan.id} value={plan._id || plan.id}>
                     {plan.name} - ${plan.basePrice} ({plan.billingCycle}) - {plan.dailyDownloadLimit} downloads/day
                   </option>
                 ))}

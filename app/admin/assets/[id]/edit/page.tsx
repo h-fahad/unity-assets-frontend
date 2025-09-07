@@ -14,8 +14,7 @@ import {
   ArrowLeft, 
   Save, 
   Eye, 
-  EyeOff, 
-  Upload,
+  EyeOff,
   Image as ImageIcon,
   FileText,
   Tag
@@ -48,6 +47,7 @@ export default function EditAsset() {
     }
     loadAssetData();
     loadCategories();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router, assetId]);
 
   const loadAssetData = async () => {

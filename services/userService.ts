@@ -23,6 +23,16 @@ export interface UserWithStats {
   createdAt: string;
   updatedAt: string;
   userSubscriptions?: any[];
+  subscription?: {
+    _id: string;
+    planName: string;
+    planPrice: number;
+    billingCycle: string;
+    dailyDownloadLimit: number;
+    startDate: string;
+    endDate: string;
+    isActive: boolean;
+  } | null;
   _count?: {
     downloads: number;
     assets: number;

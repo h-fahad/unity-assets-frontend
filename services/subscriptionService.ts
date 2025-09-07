@@ -1,7 +1,8 @@
 import api from '../lib/axios';
 
 export interface SubscriptionPlan {
-  id: number;
+  _id?: string; // MongoDB ObjectId
+  id?: number; // For backward compatibility
   name: string;
   description?: string;
   basePrice: number;
@@ -10,8 +11,8 @@ export interface SubscriptionPlan {
   dailyDownloadLimit: number;
   features: string[];
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface UserSubscription {
@@ -37,8 +38,8 @@ export interface CreatePlanData {
 export interface UpdatePlanData extends Partial<CreatePlanData> {}
 
 export interface AssignSubscriptionData {
-  userId: number;
-  planId: number;
+  userId: number | string;
+  planId: number | string;
   startDate?: string;
 }
 

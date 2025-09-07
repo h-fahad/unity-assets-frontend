@@ -730,6 +730,8 @@ export default function AdminUsers() {
                   <th className="text-left py-3 px-4 font-semibold">Email</th>
                   <th className="text-left py-3 px-4 font-semibold">Role</th>
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
+                  <th className="text-left py-3 px-4 font-semibold">Plan</th>
+                  <th className="text-left py-3 px-4 font-semibold">Start Date</th>
                   <th className="text-left py-3 px-4 font-semibold">
                     Downloads
                   </th>
@@ -776,6 +778,28 @@ export default function AdminUsers() {
                       >
                         {userData.isActive ? "Active" : "Inactive"}
                       </Badge>
+                    </td>
+                    <td className="py-4 px-4">
+                      {userData.role === "ADMIN" ? (
+                        <span className="text-sm text-gray-400 italic">Admin</span>
+                      ) : userData.subscription ? (
+                        <Badge variant="outline" className="text-xs">
+                          {userData.subscription.planName}
+                        </Badge>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-4">
+                      {userData.role === "ADMIN" ? (
+                        <span className="text-sm text-gray-400 italic">-</span>
+                      ) : userData.subscription ? (
+                        <span className="text-sm text-gray-600">
+                          {new Date(userData.subscription.startDate).toLocaleDateString()}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex items-center gap-1">
