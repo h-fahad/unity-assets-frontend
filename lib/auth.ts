@@ -44,7 +44,7 @@ export const authService = {
       const authData = response.data.data || response.data;
       const { access_token, user } = authData;
       
-      localStorage.setItem('token', access_token);
+      localStorage.setItem('access_token', access_token);
       localStorage.setItem('user', JSON.stringify(user));
       
       return { access_token, user };
@@ -92,14 +92,14 @@ export const authService = {
   },
 
   logout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     window.location.href = '/signin';
   },
 
   getToken(): string | null {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+      return localStorage.getItem('access_token');
     }
     return null;
   },

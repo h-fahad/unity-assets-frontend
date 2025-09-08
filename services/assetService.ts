@@ -5,6 +5,7 @@ export interface Asset {
   id?: number; // For backward compatibility
   name: string;
   description: string;
+  price?: number;
   fileUrl: string;
   thumbnail: string;
   imageUrl?: string;
@@ -44,6 +45,7 @@ export interface CreateAssetData {
 export interface UpdateAssetData {
   name?: string;
   description?: string;
+  price?: number;
   categoryId?: string;
   isActive?: boolean;
   tags?: string[];

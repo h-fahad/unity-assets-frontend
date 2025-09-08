@@ -128,8 +128,8 @@ export default function AdminAssets() {
       
       if (response.pagination) {
         setPagination(response.pagination);
-        setTotalPages(response.pagination.totalPages);
-        setTotalAssets(response.pagination.totalAssets);
+        setTotalPages(response.pagination.pages);
+        setTotalAssets(response.pagination.total);
       }
     } catch (error) {
       console.error("Failed to load assets:", error);

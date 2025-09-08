@@ -13,7 +13,7 @@ export const api = axios.create({
 // Add auth token to requests
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -30,7 +30,7 @@ api.interceptors.response.use(
       const isAuthEndpoint = error.config?.url?.includes('/auth/');
       
       if (!isAuthEndpoint) {
-        localStorage.removeItem('token');
+        localStorage.removeItem('access_token');
         localStorage.removeItem('user');
         // Only redirect if not already on signin page
         if (window.location.pathname !== '/signin') {

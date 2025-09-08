@@ -96,7 +96,7 @@ export const subscriptionService = {
 export async function getSubscriptionPlans() {
   const plans = await subscriptionService.getPlans();
   return plans.map(plan => ({
-    id: plan.id.toString(),
+    id: (plan._id || plan.id || '').toString(),
     name: plan.name,
     price: plan.basePrice,
     dailyDownloadLimit: plan.dailyDownloadLimit,

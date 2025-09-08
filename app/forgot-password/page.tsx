@@ -1,7 +1,12 @@
+import { Suspense } from 'react';
 import ForgotPassword from '@/components/auth/ForgotPassword';
 
 export default function ForgotPasswordPage() {
-  return <ForgotPassword />;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ForgotPassword />
+    </Suspense>
+  );
 }
 
 export const metadata = {

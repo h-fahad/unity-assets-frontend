@@ -113,7 +113,7 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
         try {
           const response = await authService.getProfile();
-          const user = response.data;
+          const user = response.data as User;
           
           set({
             user,
