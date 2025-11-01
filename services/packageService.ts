@@ -8,28 +8,28 @@ import {
 
 export const packageService = {
   async getPackages(): Promise<SubscriptionPackage[]> {
-    const response = await api.get('/subscriptions/plans');
+    const response = await api.get('/subscriptions/plans?source=database');
     // API returns { success: true, data: { plans: [...] } }
-    const plans = response.data.data.plans || [];
-    
+    const plans = response.data.data?.plans || response.data.data || [];
+
     // Transform backend data to frontend format
     return plans.map((plan: any) => ({
       ...plan,
-      id: plan._id // Transform _id to id
+      id: plan._id || plan.id // Transform _id to id
     }));
   },
 
   async getActivePackages(): Promise<SubscriptionPackage[]> {
-    const response = await api.get('/subscriptions/plans');
+    const response = await api.get('/subscriptions/plans?source=database');
     // API returns { success: true, data: { plans: [...] } }
-    const plans = response.data.data.plans || [];
-    
+    const plans = response.data.data?.plans || response.data.data || [];
+
     // Transform backend data to frontend format and filter active plans
     return plans
       .filter((plan: any) => plan.isActive)
       .map((plan: any) => ({
         ...plan,
-        id: plan._id // Transform _id to id
+        id: plan._id || plan.id // Transform _id to id
       }));
   },
 

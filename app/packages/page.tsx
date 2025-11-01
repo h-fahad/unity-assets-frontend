@@ -201,7 +201,9 @@ export default function SubscriptionPackages() {
 
       {/* Packages Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {packages.map((pkg, index) => {
+        {packages
+          .filter(pkg => pkg.billingCycle === selectedBillingCycle)
+          .map((pkg, index) => {
           const price = calculatePrice(pkg, selectedBillingCycle);
           const savings = getYearlySavings(pkg);
           const popular = isPopular(index);
