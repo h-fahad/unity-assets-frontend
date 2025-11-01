@@ -14,9 +14,11 @@ interface AssetCardProps {
 export default function AssetCard({ asset, isFeatured = false, variant = 'default' }: AssetCardProps) {
   const cardVariants = {
     default: "w-full",
-    compact: "w-full max-w-sm",
+    compact: "w-full",
     detailed: "w-full max-w-lg"
   };
+
+  const isCompact = variant === 'compact';
 
   return (
     <div className={cn(
@@ -88,19 +90,28 @@ export default function AssetCard({ asset, isFeatured = false, variant = 'defaul
         </div>
       </div>
       
-      <div className="p-5 space-y-4">
+      <div className={cn("space-y-4", isCompact ? "p-4" : "p-5")}>
         {/* Title and description */}
         <div className="space-y-2">
-          <h3 className="font-bold text-xl text-gray-900 group-hover:text-indigo-600 transition-colors duration-300 line-clamp-1">
+          <h3 className={cn(
+            "font-bold text-gray-900 group-hover:text-indigo-600 transition-colors duration-300 line-clamp-1",
+            isCompact ? "text-lg" : "text-xl"
+          )}>
             {asset.name}
           </h3>
-          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
+          <p className={cn(
+            "text-gray-600 leading-relaxed",
+            isCompact ? "text-xs line-clamp-2" : "text-sm line-clamp-2"
+          )}>
             {asset.description || 'No description available'}
           </p>
         </div>
-        
+
         {/* Enhanced stats row */}
-        <div className="flex items-center justify-between text-xs text-gray-500 bg-gray-50/80 rounded-xl px-4 py-2.5">
+        <div className={cn(
+          "flex items-center justify-between text-gray-500 bg-gray-50/80 rounded-xl",
+          isCompact ? "text-[10px] px-3 py-2" : "text-xs px-4 py-2.5"
+        )}>
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             <span className="font-medium">{asset.downloadCount || 0} downloads</span>
@@ -112,25 +123,28 @@ export default function AssetCard({ asset, isFeatured = false, variant = 'defaul
             <span>{new Date(asset.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
           </div>
         </div>
-        
+
         {/* Enhanced action buttons */}
-        <div className="flex gap-3 pt-2">
-          <Button 
-            asChild 
-            variant="outline" 
-            size="sm" 
-            className="flex-1 group-hover:border-indigo-300 group-hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300 border-2"
+        <div className={cn("flex gap-2", isCompact ? "pt-1" : "pt-2")}>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className={cn(
+              "flex-1 group-hover:border-indigo-300 group-hover:text-indigo-600 hover:bg-indigo-50 transition-all duration-300 border-2",
+              isCompact && "h-8 text-xs px-2"
+            )}
           >
-            <a href={`/asset/${asset._id || asset.id}`} className="flex items-center justify-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <a href={`/asset/${asset._id || asset.id}`} className="flex items-center justify-center gap-1.5">
+              <svg className={cn(isCompact ? "w-3 h-3" : "w-4 h-4")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              Preview
+              <span className={cn(isCompact && "hidden sm:inline")}>Preview</span>
             </a>
           </Button>
           <div className="flex-1">
-            <DownloadButton assetId={(asset._id || asset.id)?.toString() || ''} />
+            <DownloadButton assetId={(asset._id || asset.id)?.toString() || ''} compact={isCompact} />
           </div>
         </div>
       </div>
