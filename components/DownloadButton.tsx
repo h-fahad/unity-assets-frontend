@@ -7,18 +7,21 @@ import { useRouter } from 'next/navigation';
 import { downloadService, type DownloadStatus } from '@/services/downloadService';
 import toast from 'react-hot-toast';
 import { cn } from '@/lib/utils';
+import DownloadConfirmationModal from './DownloadConfirmationModal';
 
 interface DownloadButtonProps {
   assetId: string;
+  assetName?: string;
   compact?: boolean;
 }
 
-export default function DownloadButton({ assetId, compact = false }: DownloadButtonProps) {
+export default function DownloadButton({ assetId, assetName, compact = false }: DownloadButtonProps) {
   const { user, refreshUser } = useUserStore();
   const router = useRouter();
   const [downloading, setDownloading] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState<DownloadStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = useState(true);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const iconSize = compact ? "w-3 h-3" : "w-4 h-4";
 
@@ -51,17 +54,16 @@ export default function DownloadButton({ assetId, compact = false }: DownloadBut
     </svg>
   );
 
-  const handleDownload = async () => {
-    setDownloading(true);
+  const handleDownloadClick = async () => {
     try {
-      // Check current download status before attempting download
+      // Check current download status before showing modal
       const currentStatus = await downloadService.getDownloadStatus();
       setDownloadStatus(currentStatus);
-      
+
       // If user cannot download based on current status, prevent download
       if (!currentStatus.canDownload && !currentStatus.isAdmin) {
         let errorMsg = currentStatus.message;
-        
+
         if (currentStatus.remainingDownloads === 0) {
           toast.error(errorMsg, {
             duration: 6000,
@@ -92,10 +94,20 @@ export default function DownloadButton({ assetId, compact = false }: DownloadBut
             icon: '🚫',
           });
         }
-        setDownloading(false);
         return;
       }
-      
+
+      // Show confirmation modal
+      setShowConfirmModal(true);
+    } catch (error) {
+      console.error('Failed to check download status:', error);
+      toast.error('Failed to check download status. Please try again.');
+    }
+  };
+
+  const handleConfirmDownload = async () => {
+    setDownloading(true);
+    try {
       const result = await downloadService.downloadAsset(assetId);
       
       // Create a temporary download link
@@ -226,26 +238,36 @@ export default function DownloadButton({ assetId, compact = false }: DownloadBut
     // Admin users have unlimited access
     if (downloadStatus.isAdmin) {
       return (
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleDownload}
-          disabled={downloading}
-          title="Admin - Unlimited Downloads"
-          className={cn("w-full h-full flex items-center justify-center gap-1.5", compact && "h-8 text-xs px-2")}
-        >
-          {downloading ? (
-            <>
-              <LoadingIcon />
-              <span className={cn(compact && "hidden sm:inline")}>Downloading...</span>
-            </>
-          ) : (
-            <>
-              <DownloadIcon />
-              <span className={cn(compact && "hidden sm:inline")}>Download</span>
-            </>
-          )}
-        </Button>
+        <>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleDownloadClick}
+            disabled={downloading}
+            title="Admin - Unlimited Downloads"
+            className={cn("w-full h-full flex items-center justify-center gap-1.5", compact && "h-8 text-xs px-2")}
+          >
+            {downloading ? (
+              <>
+                <LoadingIcon />
+                <span className={cn(compact && "hidden sm:inline")}>Downloading...</span>
+              </>
+            ) : (
+              <>
+                <DownloadIcon />
+                <span className={cn(compact && "hidden sm:inline")}>Download</span>
+              </>
+            )}
+          </Button>
+          <DownloadConfirmationModal
+            open={showConfirmModal}
+            onOpenChange={setShowConfirmModal}
+            onConfirm={handleConfirmDownload}
+            assetName={assetName}
+            remainingDownloads="unlimited"
+            isDownloading={downloading}
+          />
+        </>
       );
     }
 
@@ -288,50 +310,69 @@ export default function DownloadButton({ assetId, compact = false }: DownloadBut
         : `${downloadStatus.remainingDownloads} left today`;
 
       return (
-        <Button
-          variant="default"
-          size="sm"
-          onClick={handleDownload}
-          disabled={downloading}
-          title={`${remainingText}${downloadStatus.subscription ? ` (${downloadStatus.subscription.planName})` : ''}`}
-          className={cn("w-full h-full flex items-center justify-center gap-1.5", compact && "h-8 text-xs px-2")}
-        >
-          {downloading ? (
-            <>
-              <LoadingIcon />
-              <span className={cn(compact && "hidden sm:inline")}>Downloading...</span>
-            </>
-          ) : (
-            <>
-              <DownloadIcon />
-              <span className={cn(compact && "hidden sm:inline")}>Download</span>
-            </>
-          )}
-        </Button>
+        <>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleDownloadClick}
+            disabled={downloading}
+            title={`${remainingText}${downloadStatus.subscription ? ` (${downloadStatus.subscription.planName})` : ''}`}
+            className={cn("w-full h-full flex items-center justify-center gap-1.5", compact && "h-8 text-xs px-2")}
+          >
+            {downloading ? (
+              <>
+                <LoadingIcon />
+                <span className={cn(compact && "hidden sm:inline")}>Downloading...</span>
+              </>
+            ) : (
+              <>
+                <DownloadIcon />
+                <span className={cn(compact && "hidden sm:inline")}>Download</span>
+              </>
+            )}
+          </Button>
+          <DownloadConfirmationModal
+            open={showConfirmModal}
+            onOpenChange={setShowConfirmModal}
+            onConfirm={handleConfirmDownload}
+            assetName={assetName}
+            remainingDownloads={downloadStatus.remainingDownloads}
+            isDownloading={downloading}
+          />
+        </>
       );
     }
   }
 
   // Fallback if no download status
   return (
-    <Button
-      variant="default"
-      size="sm"
-      onClick={handleDownload}
-      disabled={downloading}
-      className={cn("w-full h-full flex items-center justify-center gap-1.5", compact && "h-8 text-xs px-2")}
-    >
-      {downloading ? (
-        <>
-          <LoadingIcon />
-          <span className={cn(compact && "hidden sm:inline")}>Downloading...</span>
-        </>
-      ) : (
-        <>
-          <DownloadIcon />
-          <span className={cn(compact && "hidden sm:inline")}>Download</span>
-        </>
-      )}
-    </Button>
+    <>
+      <Button
+        variant="default"
+        size="sm"
+        onClick={handleDownloadClick}
+        disabled={downloading}
+        className={cn("w-full h-full flex items-center justify-center gap-1.5", compact && "h-8 text-xs px-2")}
+      >
+        {downloading ? (
+          <>
+            <LoadingIcon />
+            <span className={cn(compact && "hidden sm:inline")}>Downloading...</span>
+          </>
+        ) : (
+          <>
+            <DownloadIcon />
+            <span className={cn(compact && "hidden sm:inline")}>Download</span>
+          </>
+        )}
+      </Button>
+      <DownloadConfirmationModal
+        open={showConfirmModal}
+        onOpenChange={setShowConfirmModal}
+        onConfirm={handleConfirmDownload}
+        assetName={assetName}
+        isDownloading={downloading}
+      />
+    </>
   );
 } 

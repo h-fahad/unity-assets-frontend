@@ -144,7 +144,11 @@ export default function AssetCard({ asset, isFeatured = false, variant = 'defaul
             </a>
           </Button>
           <div className="flex-1">
-            <DownloadButton assetId={(asset._id || asset.id)?.toString() || ''} compact={isCompact} />
+            <DownloadButton
+              assetId={(asset._id || asset.id)?.toString() || ''}
+              assetName={asset.name}
+              compact={isCompact}
+            />
           </div>
         </div>
       </div>

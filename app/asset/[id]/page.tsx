@@ -152,7 +152,7 @@ export default function AssetDetailPage() {
           <div className="lg:col-span-1 space-y-6">
             
             {/* Download Card */}
-            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-6 border border-gray-100/50 sticky top-6">
+            <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-lg p-6 border border-gray-100/50 sticky top-24 sm:top-28 z-10">
               <div className="space-y-4">
                 <div className="text-center">
                   <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 rounded-full px-4 py-2 mb-4">
