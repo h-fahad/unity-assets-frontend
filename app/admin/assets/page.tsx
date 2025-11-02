@@ -442,7 +442,7 @@ export default function AdminAssets() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold">Asset</th>
+                  <th className="text-left py-3 px-4 font-semibold w-2/5">Asset</th>
                   <th className="text-left py-3 px-4 font-semibold">Category</th>
                   <th className="text-left py-3 px-4 font-semibold">Downloads</th>
                   <th className="text-left py-3 px-4 font-semibold">Status</th>
@@ -458,7 +458,7 @@ export default function AdminAssets() {
                       !asset.isActive ? "bg-gray-50/50 opacity-75" : ""
                     }`}
                   >
-                    <td className="py-4 px-4">
+                    <td className="py-4 px-4 w-2/5">
                       <div className="flex items-center gap-3">
                         <div className="relative w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                           {asset.thumbnail ? (
@@ -473,7 +473,7 @@ export default function AdminAssets() {
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1 max-w-xs">
                           <p className="font-semibold text-gray-900 truncate">
                             {asset.name}
                           </p>
