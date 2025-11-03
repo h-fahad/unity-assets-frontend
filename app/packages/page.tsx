@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { packageService } from "@/services/packageService";
-import { paymentService, CurrentSubscription } from "@/services/paymentService";
+import { paymentService } from "@/services/paymentService";
 import api from "@/lib/axios";
 import { SubscriptionPackage, BillingCycle } from "@/types/subscription";
 import {
@@ -25,10 +25,8 @@ import {
   Crown,
   Zap,
   Shield,
-  CheckCircle2,
 } from "lucide-react";
 import toast from "react-hot-toast";
-import SubscriptionChangeModal from "@/components/SubscriptionChangeModal";
 
 export default function SubscriptionPackages() {
   const { user } = useUserStore();
@@ -37,10 +35,6 @@ export default function SubscriptionPackages() {
   const [loading, setLoading] = useState(true);
   const [selectedBillingCycle, setSelectedBillingCycle] =
     useState<BillingCycle>("MONTHLY");
-  const [currentSubscription, setCurrentSubscription] = useState<CurrentSubscription | null>(null);
-  const [changeModalOpen, setChangeModalOpen] = useState(false);
-  const [selectedNewPlan, setSelectedNewPlan] = useState<SubscriptionPackage | null>(null);
-  const [changingSubscription, setChangingSubscription] = useState(false);
 
   // Calculate maximum yearly discount for the badge
   const maxYearlyDiscount = packages.length > 0
@@ -49,10 +43,7 @@ export default function SubscriptionPackages() {
 
   useEffect(() => {
     loadPackages();
-    if (user) {
-      loadCurrentSubscription();
-    }
-  }, [user]);
+  }, []);
 
   const loadPackages = async () => {
     try {
@@ -62,15 +53,6 @@ export default function SubscriptionPackages() {
       console.error("Failed to load packages:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const loadCurrentSubscription = async () => {
-    try {
-      const subscriptionData = await paymentService.getCurrentSubscription();
-      setCurrentSubscription(subscriptionData);
-    } catch (error) {
-      console.error("Failed to load current subscription:", error);
     }
   };
 
@@ -90,85 +72,6 @@ export default function SubscriptionPackages() {
       return monthlyTotal - yearlyPrice;
     }
     return 0;
-  };
-
-  const getButtonText = (pkg: SubscriptionPackage) => {
-    if (!user) return "Sign In to Subscribe";
-    if (!currentSubscription?.hasSubscription) return "Subscribe Now";
-
-    const currentPlan = currentSubscription.subscription?.plan;
-    if (!currentPlan) return "Subscribe Now";
-
-    // Check if this is the current plan (comparing by plan ID and billing cycle)
-    if (currentPlan._id === pkg.id) {
-      return "Current Plan";
-    }
-
-    // Check if upgrade or downgrade based on price
-    if (pkg.basePrice > currentPlan.basePrice) {
-      return "Upgrade";
-    } else if (pkg.basePrice < currentPlan.basePrice) {
-      return "Downgrade";
-    }
-
-    return "Switch Plan";
-  };
-
-  const isCurrentPlan = (pkg: SubscriptionPackage) => {
-    if (!currentSubscription?.hasSubscription) return false;
-    return currentSubscription.subscription?.plan._id === pkg.id;
-  };
-
-  const handlePlanAction = async (pkg: SubscriptionPackage) => {
-    if (!user) {
-      router.push("/signin");
-      return;
-    }
-
-    if (user.role === "ADMIN") {
-      toast.error("Admins cannot subscribe to packages. You have unlimited access.");
-      return;
-    }
-
-    // If user has no subscription, create new one
-    if (!currentSubscription?.hasSubscription) {
-      handleSubscribe(pkg);
-      return;
-    }
-
-    // If this is the current plan, do nothing
-    if (isCurrentPlan(pkg)) {
-      return;
-    }
-
-    // Show change modal for upgrade/downgrade
-    setSelectedNewPlan(pkg);
-    setChangeModalOpen(true);
-  };
-
-  const handleConfirmChange = async () => {
-    if (!selectedNewPlan) return;
-
-    setChangingSubscription(true);
-    try {
-      const result = await paymentService.changeSubscription(selectedNewPlan.id);
-
-      toast.success(result.message);
-
-      // Reload current subscription
-      await loadCurrentSubscription();
-
-      setChangeModalOpen(false);
-      setSelectedNewPlan(null);
-    } catch (error: unknown) {
-      console.error("Failed to change subscription:", error);
-      const errorMsg =
-        (error as { response?: { data?: { message?: string } } })?.response
-          ?.data?.message || "Failed to change subscription";
-      toast.error(errorMsg);
-    } finally {
-      setChangingSubscription(false);
-    }
   };
 
   const handleSubscribe = async (pkg: SubscriptionPackage) => {
@@ -305,24 +208,14 @@ export default function SubscriptionPackages() {
           const savings = getYearlySavings(pkg);
           const popular = isPopular(index);
 
-          const isCurrent = isCurrentPlan(pkg);
-
           return (
             <Card
               key={pkg.id}
               className={`relative transition-all duration-300 hover:shadow-lg flex flex-col h-full ${
                 popular ? "ring-2 ring-purple-500 scale-105" : ""
-              } ${isCurrent ? "ring-2 ring-green-500" : ""}`}
+              }`}
             >
-              {isCurrent && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <Badge className="bg-green-600 text-white px-4 py-1">
-                    <CheckCircle2 className="w-3 h-3 mr-1" />
-                    Current Plan
-                  </Badge>
-                </div>
-              )}
-              {!isCurrent && popular && (
+              {popular && (
                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                   <Badge className="bg-purple-500 text-white px-4 py-1">
                     <Star className="w-3 h-3 mr-1" />
@@ -400,16 +293,11 @@ export default function SubscriptionPackages() {
               <CardFooter className="space-y-2">
                 <Button
                   className={`w-full ${
-                    isCurrent
-                      ? "bg-green-600 hover:bg-green-700"
-                      : popular
-                      ? "bg-purple-600 hover:bg-purple-700"
-                      : ""
+                    popular ? "bg-purple-600 hover:bg-purple-700" : ""
                   }`}
-                  onClick={() => handlePlanAction(pkg)}
-                  disabled={isCurrent}
+                  onClick={() => handleSubscribe(pkg)}
                 >
-                  {getButtonText(pkg)}
+                  {user ? "Subscribe Now" : "Sign In to Subscribe"}
                 </Button>
               </CardFooter>
             </Card>
@@ -458,22 +346,6 @@ export default function SubscriptionPackages() {
           </div>
         </div>
       </div>
-
-      {/* Subscription Change Modal */}
-      {selectedNewPlan && currentSubscription?.subscription && (
-        <SubscriptionChangeModal
-          isOpen={changeModalOpen}
-          onClose={() => {
-            setChangeModalOpen(false);
-            setSelectedNewPlan(null);
-          }}
-          onConfirm={handleConfirmChange}
-          currentPlan={currentSubscription.subscription.plan}
-          newPlan={selectedNewPlan}
-          isUpgrade={selectedNewPlan.basePrice > currentSubscription.subscription.plan.basePrice}
-          loading={changingSubscription}
-        />
-      )}
     </main>
   );
 }
