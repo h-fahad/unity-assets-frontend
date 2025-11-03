@@ -24,6 +24,43 @@ export interface SubscriptionStatus {
   } | null;
 }
 
+export interface CurrentSubscription {
+  hasSubscription: boolean;
+  subscription: {
+    id: string;
+    stripeSubscriptionId: string;
+    plan: {
+      _id: string;
+      name: string;
+      basePrice: number;
+      dailyDownloadLimit: number;
+      billingCycle: string;
+    };
+    status: string;
+    currentPeriodStart: string;
+    currentPeriodEnd: string;
+    cancelAtPeriodEnd: boolean;
+    startDate: string;
+    endDate: string;
+  } | null;
+}
+
+export interface ChangeSubscriptionResponse {
+  message: string;
+  subscription: {
+    id: string;
+    status: string;
+    currentPeriodEnd: string;
+    newPlan: {
+      id: string;
+      name: string;
+      price: number;
+    };
+    isUpgrade: boolean;
+    effectiveDate: string;
+  };
+}
+
 export interface CustomerPortalResponse {
   url: string;
 }
@@ -63,5 +100,17 @@ export const paymentService = {
   async createManualSubscription(data: { planId: string; billingCycle?: string }): Promise<any> {
     const response = await api.post('/payments/create-subscription-manual', data);
     return response.data.data;
+  },
+
+  // Get current subscription
+  async getCurrentSubscription(): Promise<CurrentSubscription> {
+    const response = await api.get('/payments/my-subscription');
+    return response.data.data;
+  },
+
+  // Change subscription (upgrade/downgrade)
+  async changeSubscription(newPlanId: string): Promise<ChangeSubscriptionResponse> {
+    const response = await api.post('/payments/change-subscription', { newPlanId });
+    return response.data;
   }
 }; 
