@@ -143,8 +143,10 @@ export default function EnhancedSignup() {
         password: formData.password
       });
 
-      setEmailSent(true);
-      toast.success('Registration successful! Please check your email to verify your account.');
+      toast.success('Registration successful! Please check your email for a 6-digit verification code.');
+
+      // Redirect to OTP verification page
+      router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
@@ -221,7 +223,7 @@ export default function EnhancedSignup() {
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name (Optional)
+                Full Name
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

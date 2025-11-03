@@ -99,7 +99,7 @@ export interface ApiResponse<T = unknown> {
 class AuthService {
   // Enhanced registration with email verification
   async register(data: RegisterData): Promise<ApiResponse> {
-    const response: AxiosResponse<ApiResponse> = await apiClient.post('/auth/register', data);
+    const response: AxiosResponse<ApiResponse> = await apiClient.post('/auth/signup', data);
     return response.data;
   }
 
@@ -131,6 +131,12 @@ class AuthService {
   // Email verification
   async verifyEmail(token: string): Promise<ApiResponse> {
     const response: AxiosResponse<ApiResponse> = await apiClient.post('/auth/verify-email', { token });
+    return response.data;
+  }
+
+  // Email verification with OTP
+  async verifyEmailOTP(email: string, otp: string): Promise<ApiResponse> {
+    const response: AxiosResponse<ApiResponse> = await apiClient.post('/auth/verify-email-otp', { email, otp });
     return response.data;
   }
 

@@ -59,7 +59,7 @@ export const authService = {
 
   async register(data: RegisterData): Promise<User> {
     try {
-      const response = await api.post('/auth/register', data);
+      const response = await api.post('/auth/signup', data);
       
       // Handle MERN backend response format
       if (response.data.success === false) {
