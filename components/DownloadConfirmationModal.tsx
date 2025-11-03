@@ -86,7 +86,7 @@ export default function DownloadConfirmationModal({
                 <p className={`text-sm font-medium ${showWarning ? 'text-amber-900' : 'text-gray-900'}`}>
                   {getRemainingText()}
                 </p>
-                {showWarning && remainingDownloads !== 'unlimited' && (
+                {showWarning && typeof remainingDownloads === 'number' && (
                   <p className="text-xs text-amber-700 mt-1">
                     Your download limit will reset tomorrow. Use your remaining downloads wisely.
                   </p>
