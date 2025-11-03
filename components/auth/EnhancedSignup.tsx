@@ -143,10 +143,12 @@ export default function EnhancedSignup() {
         password: formData.password
       });
 
-      toast.success('Registration successful! Please check your email for a 6-digit verification code.');
+      toast.success('Registration successful! Redirecting to sign in...');
 
-      // Redirect to OTP verification page
-      router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
+      // Redirect to signin page
+      setTimeout(() => {
+        router.push('/signin');
+      }, 1500);
     } catch (error) {
       toast.error(getErrorMessage(error));
     } finally {
